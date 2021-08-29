@@ -1,64 +1,54 @@
-module Main exposing (..)
+-- Inspiration: https://github.com/w0rm/elm-mogee
 
--- Press buttons to increment and decrement a counter.
---
--- Read how it works:
---   https://guide.elm-lang.org/architecture/buttons.html
---
+module Main exposing (main)
 
+-- imports removec from button example
+-- import Html exposing (Html, button, div, text)
+-- import Html.Events exposing (onClick)
 
 import Browser
-import Html exposing (Html, button, div, text)
-import Html.Events exposing (onClick)
+import Browser.Dom exposing (getViewport)
+import Browser.Events exposing
+  ( onAnimationFrameDelta
+  , onKeyDown
+  , onKeyUp
+  , onResize
+  , onVisibilityChange
+  )
+import Html.Events exposing (keyCode)
+import Json.Decode as Decode exposing (Value)
+import Messages exposing (Msg(..))
+-- We need to write Model and View
+import Model exposing (Model) 
+import Task
+import View -- something for us to write
+import View.Font as Font
+import View.Sprite as Sprite
 
+-- Removing for now, not sure if really needed yet:
+-- import Ports exposing (gamepad)
 
 
 -- MAIN
-
-
+main: Program Value Model Msg
 main =
-  Browser.sandbox { init = init, update = update, view = view }
+  Browser.element
+    { init = init
+    , subscriptions = subscriptions
+    , update = Model.update
+    , view = View.view
+    }
 
 
-
--- MODEL
-
-
-type alias Model = Int
-
-
-init : Model
-init =
-  0
-
-
-
--- UPDATE
-
-
-type Msg
-  = Increment
-  | Decrement
-
-
-update : Msg -> Model -> Model
-update msg model =
-  case msg of
-    Increment ->
-      model + 1
-
-    Decrement ->
-      model - 1
-
-
-
--- VIEW
-
-
-view : Model -> Html Msg
-view model =
-  div []
-    [ button [ onClick Decrement ] [ text "-" ]
-    , div [] [ text (String.fromInt model) ]
-    , button [ onClick Increment ] [ text "+" ]
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+  Sub.batch
+    [
+      later
     ]
+
+init : Value -> (Model, Cmd Msg)
+init _ =
+  (
+    later
+  )

@@ -18,10 +18,11 @@ import Browser.Events exposing
 import Html.Events exposing (keyCode)
 import Json.Decode as Decode exposing (Value)
 import Messages exposing (Msg(..))
+
 -- We need to write Model and View
 import Model exposing (Model) 
 import Task
-import View -- something for us to write
+import View
 import View.Font as Font
 import View.Sprite as Sprite
 

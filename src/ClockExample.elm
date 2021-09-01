@@ -38,10 +38,10 @@ type alias Model =
 
 
 init :
-    Int
+    ()
     -> ( Model, Cmd Msg ) -- Flags are input to elm on initialization. They are defined inside the html file which includes the built js file of this elm code
 init currentTime =
-    ( Model Time.utc (Time.millisToPosix currentTime) False
+    ( Model Time.utc (Time.millisToPosix 0) False
       -- Initial state of model
     , Task.perform AdjustTimeZone Time.here
     )
@@ -154,113 +154,8 @@ viewHour hour =
     let
         rotation =
             toFloat hour * (360 / 12) - 90
-
-        r1 =
-            190
-
-        r2 =
-            235
-
-        origin =
-            250
-
-        p1x =
-            origin + (cos (degrees rotation) * r1)
-
-        p1y =
-            origin + (sin (degrees rotation) * r1)
-
-        p2x =
-            origin + (cos (degrees rotation) * r2)
-
-        p2y =
-            origin + (sin (degrees rotation) * r2)
     in
-    line
-        [ x1 (String.fromFloat p1x)
-        , y1 (String.fromFloat p1y)
-        , x2 (String.fromFloat p2x)
-        , y2 (String.fromFloat p2y)
-        , stroke "black"
-        , strokeWidth "10"
-        ]
-        []
-
-
-viewSecondHand : Int -> Svg Msg
-viewSecondHand second =
-    let
-        rotation =
-            toFloat second * (360 / 60) - 90
-
-        r1 =
-            0
-
-        r2 =
-            180
-
-        origin =
-            250
-
-        p1x =
-            origin + (cos (degrees rotation) * r1)
-
-        p1y =
-            origin + (sin (degrees rotation) * r1)
-
-        p2x =
-            origin + (cos (degrees rotation) * r2)
-
-        p2y =
-            origin + (sin (degrees rotation) * r2)
-    in
-    line
-        [ x1 (String.fromFloat p1x)
-        , y1 (String.fromFloat p1y)
-        , x2 (String.fromFloat p2x)
-        , y2 (String.fromFloat p2y)
-        , stroke "black"
-        , strokeWidth "2"
-        ]
-        []
-
-
-viewMinuteHand : Int -> Svg Msg
-viewMinuteHand minute =
-    let
-        rotation =
-            toFloat minute * (360 / 60) - 90
-
-        r1 =
-            0
-
-        r2 =
-            180
-
-        origin =
-            250
-
-        p1x =
-            origin + (cos (degrees rotation) * r1)
-
-        p1y =
-            origin + (sin (degrees rotation) * r1)
-
-        p2x =
-            origin + (cos (degrees rotation) * r2)
-
-        p2y =
-            origin + (sin (degrees rotation) * r2)
-    in
-    line
-        [ x1 (String.fromFloat p1x)
-        , y1 (String.fromFloat p1y)
-        , x2 (String.fromFloat p2x)
-        , y2 (String.fromFloat p2y)
-        , stroke "black"
-        , strokeWidth "5"
-        ]
-        []
+    viewLineOnClock rotation 190 230 10
 
 
 viewHourHand : Int -> Int -> Svg Msg
@@ -275,27 +170,45 @@ viewHourHand hour minute =
         -- Hour hand moves slowly between hours based on minutes
         rotation =
             toFloat hourAnalogue * (360 / 12) - 90 + extraRotation
+    in
+    viewLineOnClock rotation 0 90 6
 
-        r1 =
-            0
 
-        r2 =
-            90
+viewMinuteHand : Int -> Svg Msg
+viewMinuteHand minute =
+    let
+        rotation =
+            toFloat minute * (360 / 60) - 90
+    in
+    viewLineOnClock rotation 0 180 6
 
+
+viewSecondHand : Int -> Svg Msg
+viewSecondHand second =
+    let
+        rotation =
+            toFloat second * (360 / 60) - 90
+    in
+    viewLineOnClock rotation 0 180 3
+
+
+viewLineOnClock : Float -> Float -> Float -> Float -> Html Msg
+viewLineOnClock rotation rStart rEnd lineWidth =
+    let
         origin =
             250
 
         p1x =
-            origin + (cos (degrees rotation) * r1)
+            origin + (cos (degrees rotation) * rStart)
 
         p1y =
-            origin + (sin (degrees rotation) * r1)
+            origin + (sin (degrees rotation) * rStart)
 
         p2x =
-            origin + (cos (degrees rotation) * r2)
+            origin + (cos (degrees rotation) * rEnd)
 
         p2y =
-            origin + (sin (degrees rotation) * r2)
+            origin + (sin (degrees rotation) * rEnd)
     in
     line
         [ x1 (String.fromFloat p1x)
@@ -303,6 +216,6 @@ viewHourHand hour minute =
         , x2 (String.fromFloat p2x)
         , y2 (String.fromFloat p2y)
         , stroke "black"
-        , strokeWidth "5"
+        , strokeWidth (String.fromFloat lineWidth)
         ]
         []

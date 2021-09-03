@@ -17,14 +17,15 @@ import Browser.Events exposing
   )
 import Html.Events exposing (keyCode)
 import Json.Decode as Decode exposing (Value)
-import Messages exposing (Msg(..))
-import Task
+-- import Task
 
 -- We need to write Model and View
-import Model exposing (Model) 
+import Model exposing (Model)
 import View
-import View.Font as Font
-import View.Sprite as Sprite
+-- import View.Font as Font
+-- import View.Sprite as Sprite
+import Messages exposing (Msg(..))
+
 
 -- Removing for now, not sure if really needed yet:
 -- import Ports exposing (gamepad)
@@ -45,11 +46,24 @@ subscriptions : Model -> Sub Msg
 subscriptions _ =
   Sub.batch
     [
-      later
     ]
+-- Mogee example:
+-- [ onAnimationFrameDelta Animate
+--         , onKeyDown (Decode.map (KeyChange True) keyCode)
+--         , onKeyUp (Decode.map (KeyChange False) keyCode)
+--         , onResize Resize
+--         , onVisibilityChange VisibilityChange
+--         , gamepad (Gamepad.fromJson >> GamepadChange)
+--         ]
 
 init : Value -> (Model, Cmd Msg)
 init _ =
   (
-    later
+   ( Model.initial, Cmd.none )
   )
+-- Instead of Cmd.none, Mogee has:
+-- Cmd.batch
+--         [ Sprite.loadSprite SpriteLoaded
+--         , Font.load FontLoaded
+--         , Task.perform (\{ viewport } -> Resize (round viewport.width) (round viewport.height)) getViewport
+--         ]

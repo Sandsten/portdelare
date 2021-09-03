@@ -3,7 +3,5 @@ module Messages exposing (Msg(..))
 
 type Msg
     = Resize Int Int
-
-
-
--- | etc
+    | KeyChange Bool Int
+    | Animate Float

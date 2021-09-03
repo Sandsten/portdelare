@@ -14,7 +14,7 @@ import Model exposing (GameState(..), Model)
 view : Model -> Html Msg
 view model =
     Game.renderCentered { time = 0, camera = Camera.fixedHeight 7 ( 0, 1.5 ), size = ( 800, 600 ) }
-        [ viewPlayer -10 -10
+        [ viewPlayer model.pos.x model.pos.y
         ]
 
 

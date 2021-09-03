@@ -6,6 +6,7 @@ module Model exposing
     )
 
 import Messages exposing (Msg(..))
+import Components.Keys as Keys exposing (Keys, codes)
 
 
 
@@ -30,6 +31,8 @@ type GameState
 type alias Model =
     { sound : Bool -- just an example
     , state : GameState
+    , pos : { x : Float, y : Float }
+    , keys : Keys
     }
 
 
@@ -37,6 +40,8 @@ initial : Model
 initial =
     { sound = True
     , state = Playing
+    , pos = { x = 0, y = 0 }
+    , keys = Keys.initial
     }
 
 
@@ -46,17 +51,57 @@ initial =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update action model =
-    ( model, Cmd.none )
+  case action of
+    Resize w h ->
+      ( model, Cmd.none )
+    -- I think this thing is just for reading some boring key commands
+    KeyChange pressed keyCode ->
+      ( { model
+                | keys = Keys.keyChange pressed keyCode model.keys
+                -- , padding =
+                --     -- resize the vieport with `-` and `=`
+                --     case ( pressed, keyCode ) of
+                --         ( True, 189 ) ->
+                --             model.padding + 1
+
+                --         ( True, 187 ) ->
+                --             max 0 (model.padding - 1)
+
+                --         _ ->
+                --             model.padding
+        }
+        , Cmd.none
+      )
+    Animate elapsed ->
+      model
+        |> animate elapsed
+        |> animateKeys elapsed
 
 
-
--- Should be a big case-of on the `action` for all the possible messages
--- Helper function to be called from `update`
 
 
 animate : Float -> Model -> ( Model, Cmd Msg )
 animate elapsed model =
-    ( model, Cmd.none )
+  case model.state of
+    Playing -> 
+      ( updatePos model, Cmd.none )
+    Paused ->
+      ( model, Cmd.none )
+
+
+animateKeys : Float -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
+animateKeys elapsed ( model, cmd ) =
+    ( { model | keys = Keys.animate elapsed model.keys }
+    , cmd
+    )
+
+
+updatePos : Model -> Model
+updatePos model =
+  let
+    { x, y } = Keys.directions model.keys
+  in { model
+    | pos = { x = model.pos.x + x, y = model.pos.y + y } }
 
 
 

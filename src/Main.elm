@@ -3,13 +3,11 @@
 
 module Main exposing (main)
 
--- imports removec from button example
--- import Html exposing (Html, button, div, text)
--- import Html.Events exposing (onClick)
+-- -- Removed imports from Mogee
 -- import Task
--- We need to write Model and View
 -- import View.Font as Font
 -- import View.Sprite as Sprite
+-- import Ports exposing (gamepad)
 
 import Browser
 import Browser.Dom exposing (getViewport)
@@ -29,10 +27,6 @@ import View
 
 
 
--- Removing for now, not sure if really needed yet:
--- import Ports exposing (gamepad)
--- MAIN
-
 
 main : Program Value Model Msg
 main =
@@ -47,11 +41,15 @@ main =
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
-        []
+        [ onAnimationFrameDelta Animate
+        , onKeyDown (Decode.map (KeyChange True) keyCode)
+        , onKeyUp (Decode.map (KeyChange False) keyCode)
+        , onResize Resize
+        ]
 
 
 
--- Mogee example:
+-- -- Mogee example Sub.batch:
 -- [ onAnimationFrameDelta Animate
 --         , onKeyDown (Decode.map (KeyChange True) keyCode)
 --         , onKeyUp (Decode.map (KeyChange False) keyCode)
@@ -67,7 +65,7 @@ init _ =
 
 
 
--- Instead of Cmd.none, Mogee has:
+-- -- Instead of `Cmd.none` in `init`, Mogee has:
 -- Cmd.batch
 --         [ Sprite.loadSprite SpriteLoaded
 --         , Font.load FontLoaded

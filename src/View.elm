@@ -2,6 +2,10 @@ module View exposing (view)
 
 -- Temporary import, stolen from button example
 
+import Color
+import Game.TwoD as Game
+import Game.TwoD.Camera as Camera exposing (Camera)
+import Game.TwoD.Render as Render exposing (Renderable, circle, rectangle)
 import Html exposing (Html, div, text)
 import Messages exposing (Msg)
 import Model exposing (GameState(..), Model)
@@ -9,13 +13,25 @@ import Model exposing (GameState(..), Model)
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ div [] [ text "Hej" ]
+    Game.renderCentered { time = 0, camera = Camera.fixedHeight 7 ( 0, 1.5 ), size = ( 800, 600 ) }
+        [ viewPlayer -10 -10
         ]
 
 
+viewPlayer : Float -> Float -> Renderable
+viewPlayer x y =
+    let
+        playerColor =
+            Color.green
 
--- Mogee's view:
+        playerPosition =
+            ( x, y )
+    in
+    Render.shape rectangle { color = playerColor, position = playerPosition, size = ( 10, 10 ) }
+
+
+
+-- Mogee's view:1
 -- let
 --       ( w, h ) =
 --           model.size

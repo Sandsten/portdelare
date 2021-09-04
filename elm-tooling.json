@@ -1,0 +1,4 @@
+{
+	"_comment": "This file tells the elm tooling which files have a `main` function",
+	"entrypoints": ["./src/Main.elm"]
+}

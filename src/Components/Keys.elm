@@ -1,25 +1,22 @@
 module Components.Keys exposing
-  ( Keys
-  , codes
-  , initial
-  , keyChange
-  , directions
-  , animate
-  )
-
-
+    ( Keys
+    , animate
+    , codes
+    , directions
+    , initial
+    , keyChange
+    )
 
 import Dict exposing (Dict)
 
 
-
 type alias Keys =
-  Dict Int Float
-
+    Dict Int Float
 
 
 initial : Keys
-initial = Dict.empty
+initial =
+    Dict.empty
 
 
 codes :
@@ -42,7 +39,6 @@ codes =
     , up = 38
     , down = 40
     }
-
 
 
 keyChange : Bool -> Int -> Keys -> Keys

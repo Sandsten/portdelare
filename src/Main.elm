@@ -26,8 +26,6 @@ import Model exposing (Model)
 import View
 
 
-
-
 main : Program Value Model Msg
 main =
     Browser.element

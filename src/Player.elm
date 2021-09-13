@@ -34,10 +34,15 @@ animate dt direction p =
   let
     newVelocity = add p.velocity (scale dt p.acceleration)
     newSpeed = norm newVelocity
+    newPos = add p.pos (scale dt p.velocity)
     
   in
     { p
-    | pos = add p.pos (scale dt p.velocity)
+    | pos = Vector
+      ( if newPos.x <= -4 + 1/4 then -4 + 1/4 else
+        if newPos.x >= 4 - 1/4 then 4 - 1/4 else newPos.x
+      )
+      ( newPos.y )
     , velocity = if (newSpeed <= maxSpeed)
                  then newVelocity
                  else scale (maxSpeed/newSpeed) newVelocity

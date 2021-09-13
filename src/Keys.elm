@@ -1,4 +1,4 @@
-module Components.Keys exposing
+module Keys exposing
     ( Keys
     , animate
     , codes

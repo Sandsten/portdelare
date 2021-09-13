@@ -3,10 +3,13 @@ module Model exposing
     , Model
     , initial
     , update
+    , playerPos
     )
 
-import Components.Keys as Keys exposing (Keys, codes)
+import Keys as Keys exposing (Keys, codes)
 import Messages exposing (Msg(..))
+import Player exposing (..)
+import Geometry exposing (Vector)
 
 
 
@@ -31,8 +34,8 @@ type GameState
 type alias Model =
     { sound : Bool -- just an example
     , state : GameState
-    , pos : { x : Float, y : Float }
     , keys : Keys
+    , player : Player
     }
 
 
@@ -40,8 +43,8 @@ initial : Model
 initial =
     { sound = True
     , state = Playing
-    , pos = { x = 0, y = 0 }
     , keys = Keys.initial
+    , player = Player.initial
     }
 
 
@@ -99,9 +102,15 @@ animateKeys elapsed ( model, cmd ) =
 updatePos : Model -> Model
 updatePos model =
     let
-        { x, y } =
-            Keys.directions model.keys
+        { x, y } = Keys.directions model.keys
+        player = model.player
+            
     in
     { model
-        | pos = { x = model.pos.x + x, y = model.pos.y + y }
+      | player = { player
+        | pos = Vector (model.player.pos.x + x) (model.player.pos.y + y)
+      }
     }
+
+playerPos : Model -> Vector
+playerPos m = m.player.pos

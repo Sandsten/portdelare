@@ -8,24 +8,25 @@ import Game.TwoD.Camera as Camera exposing (Camera)
 import Game.TwoD.Render as Render exposing (Renderable, circle, rectangle)
 import Html exposing (Html, div, text)
 import Messages exposing (Msg)
-import Model exposing (GameState(..), Model)
+import Model exposing (GameState(..), Model, playerPos)
+import Geometry exposing (Vector)
 
 
 view : Model -> Html Msg
 view model =
     Game.renderCentered { time = 0, camera = Camera.fixedHeight 7 ( 0, 1.5 ), size = ( 800, 600 ) }
-        [ viewPlayer model.pos.x model.pos.y
+        [ viewPlayer <| playerPos model
         ]
 
 
-viewPlayer : Float -> Float -> Renderable
-viewPlayer x y =
+viewPlayer : Vector -> Renderable
+viewPlayer pos =
     let
         playerColor =
             Color.green
 
         playerPosition =
-            ( x, y )
+            ( pos.x, pos.y )
     in
     Render.shape rectangle { color = playerColor, position = playerPosition, size = ( 10, 10 ) }
 

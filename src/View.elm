@@ -4,6 +4,7 @@ module View exposing (view)
 
 import Browser.Dom exposing (getViewport)
 import Color
+import Debug
 import Game.TwoD as Game
 import Game.TwoD.Camera as Camera exposing (Camera)
 import Game.TwoD.Render as Render exposing (Renderable, circle, rectangle)
@@ -12,6 +13,7 @@ import Html exposing (Html, div, text)
 import Html.Attributes as Attr
 import Messages exposing (Msg)
 import Model exposing (GameState(..), Model, playerPos)
+import Geometry exposing(..)
 
 
 viewPlayer : Vector -> Renderable
@@ -20,8 +22,7 @@ viewPlayer pos =
         playerColor =
             Color.green
 
-        playerPosition =
-            ( pos.x, pos.y )
+        playerPosition = ( pos.x - 0.25, pos.y - 0.25)
     in
     Render.shape rectangle { color = playerColor, position = playerPosition, size = ( 0.5, 0.5 ) }
 

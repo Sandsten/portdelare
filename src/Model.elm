@@ -2,14 +2,15 @@ module Model exposing
     ( GameState(..)
     , Model
     , initial
-    , update
     , playerPos
+    , update
     )
 
+import Browser.Dom exposing (getViewport)
+import Geometry exposing (Vector)
 import Keys as Keys exposing (Keys, codes)
 import Messages exposing (Msg(..))
 import Player exposing (..)
-import Geometry exposing (Vector)
 
 
 
@@ -36,6 +37,7 @@ type alias Model =
     , state : GameState
     , keys : Keys
     , player : Player
+    , screenSize : { w : Int, h : Int }
     }
 
 
@@ -45,6 +47,7 @@ initial =
     , state = Playing
     , keys = Keys.initial
     , player = Player.initial
+    , screenSize = { w = 800, h = 500 } -- Have to get the initial size somehow
     }
 
 
@@ -55,8 +58,13 @@ initial =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update action model =
     case action of
+        -- If the user changes the size of their browser window
         Resize w h ->
-            ( model, Cmd.none )
+            ( { model
+                | screenSize = { w = w, h = h }
+              }
+            , Cmd.none
+            )
 
         -- I think this thing is just for reading some boring key commands
         KeyChange pressed keyCode ->
@@ -102,15 +110,20 @@ animateKeys elapsed ( model, cmd ) =
 updatePos : Model -> Model
 updatePos model =
     let
-        { x, y } = Keys.directions model.keys
-        player = model.player
-            
+        { x, y } =
+            Keys.directions model.keys
+
+        player =
+            model.player
     in
     { model
-      | player = { player
-        | pos = Vector (model.player.pos.x + x) (model.player.pos.y + y)
-      }
+        | player =
+            { player
+                | pos = Vector (model.player.pos.x + x) (model.player.pos.y + y)
+            }
     }
 
+
 playerPos : Model -> Vector
-playerPos m = m.player.pos
+playerPos m =
+    m.player.pos

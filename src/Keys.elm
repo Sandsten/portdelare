@@ -8,6 +8,7 @@ module Keys exposing
     )
 
 import Dict exposing (Dict)
+import Geometry exposing (..)
 
 
 type alias Keys =
@@ -64,7 +65,8 @@ down =
     Dict.member
 
 
-directions : Keys -> { x : Float, y : Float }
+-- Returns a normalised direction (depending on which arrow keys are pressed)
+directions : Keys -> Vector 
 directions keys =
     let
         direction a b =
@@ -78,6 +80,7 @@ directions keys =
                 _ ->
                     0
     in
-    { x = direction (down codes.left keys) (down codes.right keys)
-    , y = direction (down codes.down keys) (down codes.up keys)
-    }
+    normalise ( Vector
+        (direction (down codes.left keys) (down codes.right keys))
+        (direction (down codes.down keys) (down codes.up keys))
+    )

@@ -9,7 +9,7 @@ module Model exposing
 import Keys as Keys exposing (Keys, codes)
 import Messages exposing (Msg(..))
 import Player exposing (..)
-import Geometry exposing (Vector)
+import Geometry exposing (..)
 
 
 
@@ -86,7 +86,9 @@ animate : Float -> Model -> ( Model, Cmd Msg )
 animate elapsed model =
     case model.state of
         Playing ->
-            ( updatePos model, Cmd.none )
+            ( { model | player = Player.animate elapsed (Keys.directions model.keys) model.player }
+            , Cmd.none
+            )
 
         Paused ->
             ( model, Cmd.none )
@@ -99,18 +101,19 @@ animateKeys elapsed ( model, cmd ) =
     )
 
 
-updatePos : Model -> Model
-updatePos model =
-    let
-        { x, y } = Keys.directions model.keys
-        player = model.player
+-- updatePos : Model -> Model
+-- updatePos model =
+--     let
+--         dir = Keys.directions model.keys
+--         player = model.player
             
-    in
-    { model
-      | player = { player
-        | pos = Vector (model.player.pos.x + x) (model.player.pos.y + y)
-      }
-    }
+--     in
+--     { model
+--       | player = { player
+--         | pos = add model.player.pos dir
+--       }
+--     }
 
+-- Return the position of the player, without needing to expose inner workings
 playerPos : Model -> Vector
 playerPos m = m.player.pos

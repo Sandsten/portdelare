@@ -12,13 +12,13 @@ type alias Player =
   }
 
 maxSpeed : Float
-maxSpeed = 0.01
+maxSpeed = 0.005
 
 defaultAcceleration : Float
-defaultAcceleration = 0.0001
+defaultAcceleration = 0.00005
 
 defaultDrag : Float
-defaultDrag = 0.001
+defaultDrag = 0.005
 
 
 initial : Player

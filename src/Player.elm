@@ -25,7 +25,7 @@ defaultAcceleration =
 
 defaultDrag : Float
 defaultDrag =
-    0.05
+    0.018
 
 
 initial : Player

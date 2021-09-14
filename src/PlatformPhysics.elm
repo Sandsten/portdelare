@@ -116,7 +116,7 @@ computeAcceleration direction velocity pos gameWorldSize =
               else
                   add
                       ( scale defaultAcceleration <| normalise { direction | y = 0 } )
-                      ( if (pos.y == 1/4 - gameWorldSize.y/2) && not (direction.y == 0) then
+                      ( if (pos.y == 1/4 - gameWorldSize.y/2) && not (direction.y <= 0) then
                            scale jumpAcc up
                         else
                            nullVector

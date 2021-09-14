@@ -2,6 +2,8 @@ module PlatformPhysics exposing (..)
 
 
 import Geometry exposing (..)
+import Maybe exposing (withDefault)
+import Json.Decode exposing (null)
 
 
 maxSpeed : Float
@@ -11,7 +13,7 @@ maxSpeed =
 
 minSpeed : Float
 minSpeed =
-    0.001
+    0.0005
 
 
 defaultAcceleration : Float
@@ -26,6 +28,10 @@ dragCoeff =
 gravity : Float
 gravity =
     0.000025
+
+jumpAcc : Float
+jumpAcc =
+    0.002
 
 computePosition : Float -> Vector -> Vector -> Vector -> Vector
 computePosition dt pos velocity gameWorldSize =
@@ -89,12 +95,13 @@ computeVelocity dt hasForce acceleration velocity =
             rescale cappedSpeed naiveVelocity
           
     in
-        if hasForce || ((dt * norm acceleration) <= norm velocity)
-        then cappedVelocity
-        else nullVector
+        if hasForce || ((dt * abs acceleration.x) <= norm velocity) then
+            cappedVelocity
+        else
+            nullVector
 
-computeAcceleration : Vector -> Vector -> Vector
-computeAcceleration direction velocity =
+computeAcceleration : Vector -> Vector -> Vector -> Vector -> Vector
+computeAcceleration direction velocity pos gameWorldSize =
     let
         drag = scale ((norm velocity)^2 * dragCoeff) <| flip <| normalise velocity
     in
@@ -103,5 +110,12 @@ computeAcceleration direction velocity =
             ( if isNullVector direction then
                   drag
               else
-                  scale defaultAcceleration direction
+                  add
+                      ( scale defaultAcceleration <| normalise { direction | y = 0 } )
+                      ( if (pos.y == 1/4 - gameWorldSize.y/2) && not (direction.y == 0) then
+                           scale jumpAcc up
+                        else
+                           nullVector
+                      )
             )
+        

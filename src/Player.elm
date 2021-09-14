@@ -3,7 +3,7 @@ module Player exposing (..)
 import Debug exposing (..)
 import Geometry exposing (..)
 import Html exposing (p)
-import TopdownPhysics as Physics
+import PlatformPhysics as Physics
 
 
 type alias Player =
@@ -36,7 +36,7 @@ animate dt direction p gameWorldSize =
         , velocity =
             Physics.computeVelocity dt hasForce p.acceleration p.velocity
         , acceleration =
-            Physics.computeAcceleration direction p.velocity
+            Physics.computeAcceleration direction p.velocity p.pos gameWorldSize
     }
 
 

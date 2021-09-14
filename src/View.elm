@@ -4,7 +4,6 @@ module View exposing (view)
 
 import Browser.Dom exposing (getViewport)
 import Color
-import Debug
 import Game.Resources as Resources exposing (Resources)
 import Game.TwoD as Game
 import Game.TwoD.Camera as Camera exposing (Camera)
@@ -60,7 +59,7 @@ view model =
     let
         -- scale canvas to have the same aspect ratio as our camera?
         aspectRatio =
-            model.gameWorldSize.y / model.gameWorldSize.x
+            model.world.size.y / model.world.size.x
 
         canvasWidth =
             round model.screenSize.x
@@ -69,6 +68,6 @@ view model =
             round (model.screenSize.x * aspectRatio)
     in
     div [ Attr.style "overflow" "hidden", Attr.style "width" "100vw", Attr.style "height" "100vh", style "background-color" "black" ]
-        [ Game.renderCentered { time = 0, camera = camera model.gameWorldSize, size = ( canvasWidth, canvasHeight ) }
+        [ Game.renderCentered { time = 0, camera = camera model.world.size, size = ( canvasWidth, canvasHeight ) }
             (render model)
         ]

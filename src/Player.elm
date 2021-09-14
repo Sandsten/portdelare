@@ -3,6 +3,7 @@ module Player exposing (..)
 import Debug exposing (..)
 import Geometry exposing (..)
 import Html exposing (p)
+import TopdownPhysics as Physics
 
 
 type alias Player =
@@ -13,20 +14,6 @@ type alias Player =
     }
 
 
-maxSpeed : Float
-maxSpeed =
-    0.005
-
-
-defaultAcceleration : Float
-defaultAcceleration =
-    0.00005
-
-
-defaultDrag : Float
-defaultDrag =
-    0.025
-
 
 initial : Player
 initial =
@@ -36,16 +23,11 @@ initial =
     , alive = True
     }
 
+-- TODO: move "computePosition to Physics"
 
 animate : Float -> Vector -> Player -> Vector -> Player
 animate dt direction p gameWorldSize =
     let
-        newVelocity =
-            computeVelocity dt (not <| isNullVector direction) p.acceleration p.velocity
-
-        newSpeed =
-            norm newVelocity
-
         newPos =
             add p.pos (scale dt p.velocity)
 
@@ -60,6 +42,9 @@ animate dt direction p gameWorldSize =
 
         lowerBound =
             -gameWorldSize.y / 2
+
+        hasForce =
+            not <| isNullVector direction
     in
     { p
         | pos =
@@ -82,39 +67,11 @@ animate dt direction p gameWorldSize =
                  else
                     newPos.y
                 )
-        , velocity = newVelocity
+        , velocity =
+            Physics.computeVelocity dt hasForce p.acceleration p.velocity
         , acceleration =
-            if isNullVector direction then
-                scale (newSpeed * defaultDrag) <| flip <| normalise p.velocity
-
-            else
-                scale defaultAcceleration direction
+            Physics.computeAcceleration direction p.velocity
     }
 
 
 
--- First, we bound the speed by maxSpeed.
--- Then, we set the velocity to zero if:
---  * there is no force acting on the object, and
---  * the speed change is larger than the speed.
-
-
-computeVelocity dt hasForce acceleration velocity =
-    let
-        naiveVelocity =
-            add velocity (scale dt acceleration)
-
-        naiveSpeed =
-            norm naiveVelocity
-
-        cappedSpeed =
-            min naiveSpeed maxSpeed
-
-        cappedVelocity =
-            rescale cappedSpeed naiveVelocity
-    in
-    if hasForce || (dt * norm acceleration >= norm velocity) then
-        cappedVelocity
-
-    else
-        nullVector

@@ -9,9 +9,10 @@ module Model exposing
 import Browser.Dom exposing (getViewport)
 import Game.Resources as Resources exposing (Resources)
 import Geometry exposing (..)
-import Keys as Keys exposing (Keys, codes)
+import Keys as Keys exposing (Keys)
 import Messages exposing (Msg(..))
 import Player exposing (..)
+import World exposing (..)
 
 
 
@@ -39,8 +40,8 @@ type alias Model =
     , keys : Keys
     , player : Player
     , screenSize : Vector
-    , gameWorldSize : Vector
     , resources : Resources
+    , world : World
     }
 
 
@@ -51,8 +52,8 @@ initial =
     , keys = Keys.initial
     , player = Player.initial
     , screenSize = Vector 800 500 -- Have to get the initial size somehow
-    , gameWorldSize = Vector 16 8
     , resources = Resources.init
+    , world = World.initial
     }
 
 
@@ -104,7 +105,7 @@ animate : Float -> Model -> ( Model, Cmd Msg )
 animate elapsed model =
     case model.state of
         Playing ->
-            ( { model | player = Player.animate elapsed (Keys.directions model.keys) model.player model.gameWorldSize }
+            ( { model | player = Player.animate elapsed (Keys.directions model.keys) model.player model.world.size }
             , Cmd.none
             )
 
@@ -120,17 +121,6 @@ animateKeys elapsed ( model, cmd ) =
 
 
 
--- updatePos : Model -> Model
--- updatePos model =
---     let
---         dir = Keys.directions model.keys
---         player = model.player
---     in
---     { model
---       | player = { player
---         | pos = add model.player.pos dir
---       }
---     }
 -- Return the position of the player, without needing to expose inner workings
 
 

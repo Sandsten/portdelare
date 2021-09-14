@@ -87,8 +87,8 @@ computeVelocity dt hasForce acceleration velocity =
     else
         nullVector
 
-computeAcceleration : Vector -> Vector -> Vector
-computeAcceleration direction velocity =
+computeAcceleration : Vector -> Vector -> Vector -> Vector -> Vector
+computeAcceleration direction velocity pos gameWorldSize =
     if isNullVector direction then
         scale ((norm velocity)^2 * defaultDrag) <| flip <| normalise velocity
     else

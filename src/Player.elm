@@ -37,39 +37,84 @@ initial =
     }
 
 
-animate : Float -> Vector -> Player -> Player
-animate dt direction p =
-  let
-    newVelocity = computeVelocity dt (not <| isNullVector direction) p.acceleration p.velocity
-    newSpeed = norm newVelocity
-    newPos = add p.pos (scale dt p.velocity)
-  in
+animate : Float -> Vector -> Player -> Vector -> Player
+animate dt direction p gameWorldSize =
+    let
+        newVelocity =
+            computeVelocity dt (not <| isNullVector direction) p.acceleration p.velocity
+
+        newSpeed =
+            norm newVelocity
+
+        newPos =
+            add p.pos (scale dt p.velocity)
+
+        leftBound =
+            -gameWorldSize.x / 2
+
+        rightBound =
+            gameWorldSize.x / 2
+
+        upperBound =
+            gameWorldSize.y / 2
+
+        lowerBound =
+            -gameWorldSize.y / 2
+    in
     { p
-    | pos = Vector
-      ( if newPos.x <= -4 + 1/4 then -4 + 1/4 else
-        if newPos.x >= 4 - 1/4 then 4 - 1/4 else newPos.x
-      )
-      ( newPos.y )
-    , velocity = newVelocity
-    , acceleration =
-      if isNullVector direction then
-        scale (newSpeed * defaultDrag) <| flip <| normalise p.velocity
-      else
-        scale defaultAcceleration direction
+        | pos =
+            Vector
+                (if newPos.x <= leftBound + 1 / 4 then
+                    leftBound + 1 / 4
+
+                 else if newPos.x >= rightBound - 1 / 4 then
+                    rightBound - 1 / 4
+
+                 else
+                    newPos.x
+                )
+                (if newPos.y <= lowerBound + 1 / 4 then
+                    lowerBound + 1 / 4
+
+                 else if newPos.y >= upperBound - 1 / 4 then
+                    upperBound - 1 / 4
+
+                 else
+                    newPos.y
+                )
+        , velocity = newVelocity
+        , acceleration =
+            if isNullVector direction then
+                scale (newSpeed * defaultDrag) <| flip <| normalise p.velocity
+
+            else
+                scale defaultAcceleration direction
     }
+
+
 
 -- First, we bound the speed by maxSpeed.
 -- Then, we set the velocity to zero if:
 --  * there is no force acting on the object, and
 --  * the speed change is larger than the speed.
-computeVelocity dt hasForce acceleration velocity = 
-  let
-    naiveVelocity = add velocity (scale dt acceleration)
-    naiveSpeed = norm naiveVelocity
-    cappedSpeed = min naiveSpeed maxSpeed
-    cappedVelocity = rescale cappedSpeed naiveVelocity
 
-  in
-    if (hasForce || (dt * (norm acceleration) >= (norm velocity)))
-    then cappedVelocity
-    else nullVector
+
+computeVelocity dt hasForce acceleration velocity =
+    let
+        naiveVelocity =
+            add velocity (scale dt acceleration)
+
+        naiveSpeed =
+            norm naiveVelocity
+
+        cappedSpeed =
+            min naiveSpeed maxSpeed
+
+        cappedVelocity =
+            rescale cappedSpeed naiveVelocity
+    in
+    if hasForce || (dt * norm acceleration >= norm velocity) then
+        cappedVelocity
+
+    else
+        nullVector

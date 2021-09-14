@@ -7,11 +7,10 @@ module Model exposing
     )
 
 import Browser.Dom exposing (getViewport)
-import Geometry exposing (Vector)
+import Geometry exposing (..)
 import Keys as Keys exposing (Keys, codes)
 import Messages exposing (Msg(..))
 import Player exposing (..)
-import Geometry exposing (..)
 
 
 
@@ -38,7 +37,8 @@ type alias Model =
     , state : GameState
     , keys : Keys
     , player : Player
-    , screenSize : { w : Int, h : Int }
+    , screenSize : Vector
+    , gameWorldSize : Vector
     }
 
 
@@ -48,7 +48,8 @@ initial =
     , state = Playing
     , keys = Keys.initial
     , player = Player.initial
-    , screenSize = { w = 800, h = 500 } -- Have to get the initial size somehow
+    , screenSize = Vector 800 500 -- Have to get the initial size somehow
+    , gameWorldSize = Vector 16 8
     }
 
 
@@ -62,7 +63,7 @@ update action model =
         -- If the user changes the size of their browser window
         Resize w h ->
             ( { model
-                | screenSize = { w = w, h = h }
+                | screenSize = Vector (toFloat w) (toFloat h)
               }
             , Cmd.none
             )
@@ -95,7 +96,7 @@ animate : Float -> Model -> ( Model, Cmd Msg )
 animate elapsed model =
     case model.state of
         Playing ->
-            ( { model | player = Player.animate elapsed (Keys.directions model.keys) model.player }
+            ( { model | player = Player.animate elapsed (Keys.directions model.keys) model.player model.gameWorldSize }
             , Cmd.none
             )
 
@@ -110,20 +111,21 @@ animateKeys elapsed ( model, cmd ) =
     )
 
 
+
 -- updatePos : Model -> Model
 -- updatePos model =
 --     let
 --         dir = Keys.directions model.keys
 --         player = model.player
-            
 --     in
 --     { model
 --       | player = { player
 --         | pos = add model.player.pos dir
 --       }
 --     }
-
 -- Return the position of the player, without needing to expose inner workings
+
+
 playerPos : Model -> Vector
 playerPos m =
     m.player.pos

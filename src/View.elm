@@ -4,7 +4,7 @@ module View exposing (view)
 
 import Browser.Dom exposing (getViewport)
 import Color
-import Debug
+import Game.Resources as Resources exposing (Resources)
 import Game.TwoD as Game
 import Game.TwoD.Camera as Camera exposing (Camera)
 import Game.TwoD.Render as Render exposing (Renderable, circle, rectangle)
@@ -16,8 +16,8 @@ import Model exposing (GameState(..), Model, playerPos)
 import String exposing (toInt)
 
 
-viewPlayer : Vector -> Renderable
-viewPlayer pos =
+renderPlayer : Vector -> Renderable
+renderPlayer pos =
     let
         playerColor =
             Color.green
@@ -28,23 +28,30 @@ viewPlayer pos =
     Render.shape rectangle { color = playerColor, position = playerSpritePos, size = ( 0.5, 0.5 ) }
 
 
-viewBackground : Vector -> Renderable
-viewBackground gameWorldSize =
-    let
-        -- set size of background to cover the canvas exactly
-        size =
-            Vector gameWorldSize.x gameWorldSize.y
-
-        pos =
-            scale 0.5 <| flip size
-    in
-    Render.shape rectangle { color = Color.white, position = ( pos.x, pos.y ), size = ( size.x, size.y ) }
+renderBackground : Resources -> List Renderable
+renderBackground resources =
+    [ Render.parallaxScroll
+        { z = -0.99
+        , texture = Resources.getTexture "images/rocks.png" resources
+        , tileWH = ( 1, 1 )
+        , scrollSpeed = ( 0.25, 0.25 )
+        }
+    ]
 
 
 camera : Vector -> Camera
 camera gameWorldSize =
     -- width times height of scene units!
     Camera.fixedArea (gameWorldSize.x * gameWorldSize.y) ( 0, 0 )
+
+
+render : Model -> List Renderable
+render model =
+    List.concat
+        [ renderBackground model.resources
+        , [ renderPlayer model.player.pos
+          ]
+        ]
 
 
 view : Model -> Html Msg
@@ -62,7 +69,5 @@ view model =
     in
     div [ Attr.style "overflow" "hidden", Attr.style "width" "100vw", Attr.style "height" "100vh", style "background-color" "black" ]
         [ Game.renderCentered { time = 0, camera = camera model.world.size, size = ( canvasWidth, canvasHeight ) }
-            [ viewPlayer <| playerPos model
-            , viewBackground model.world.size
-            ]
+            (render model)
         ]

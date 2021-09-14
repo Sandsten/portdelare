@@ -4,6 +4,7 @@ module View exposing (view)
 
 import Browser.Dom exposing (getViewport)
 import Color
+import Debug exposing (log)
 import Game.Resources as Resources exposing (Resources)
 import Game.TwoD as Game
 import Game.TwoD.Camera as Camera exposing (Camera)
@@ -39,10 +40,74 @@ renderBackground resources =
     ]
 
 
-camera : Vector -> Camera
-camera gameWorldSize =
-    -- width times height of scene units!
-    Camera.fixedArea (gameWorldSize.x * gameWorldSize.y) ( 0, 0 )
+
+-- Idea: If player is outside a specific radius from the camera -> move camera towards player
+-- TODO: Add target pos of camera and animate it towards the position
+
+
+newCameraPos : Camera -> Vector -> Camera
+newCameraPos camera playerPosition =
+    let
+        ( cameraPositionX, cameraPositionY ) =
+            Camera.getPosition camera
+
+        cameraPosition =
+            Vector cameraPositionX cameraPositionY
+
+        cameraToPlayer =
+            subtract playerPosition cameraPosition
+
+        cameraDistanceToPlayer =
+            norm cameraToPlayer
+
+        maxDistanceFromPlayer =
+            2.0
+
+        newPos =
+            add playerPosition (scale maxDistanceFromPlayer (flip (normalise cameraToPlayer)))
+    in
+    if cameraDistanceToPlayer > maxDistanceFromPlayer then
+        -- Camera.moveTo ( newPos.x, newPos.y ) camera
+        camera
+
+    else
+        camera
+
+
+newCameraPos2 : Model -> Camera -> Vector -> Camera
+newCameraPos2 model camera cameraSize =
+    let
+        leftBound =
+            -model.world.size.x / 2 + (cameraSize.x / 2)
+
+        rightBound =
+            model.world.size.x / 2 - (cameraSize.x / 2)
+
+        upperBound =
+            model.world.size.y / 2 + (cameraSize.y / 2)
+
+        lowerBound =
+            -model.world.size.y / 2 - (cameraSize.x / 2)
+    in
+    if model.player.pos.x >= rightBound || model.player.pos.x <= leftBound || model.player.pos.y > upperBound || model.player.pos.y < lowerBound then
+        camera
+
+    else
+        -- Camera.moveTo ( model.player.pos.x, model.player.pos.y ) camera
+        camera
+
+
+getCamera : Model -> Camera
+getCamera model =
+    let
+        cameraSize =
+            scale 1 model.world.size
+
+        camera =
+            Camera.fixedArea (cameraSize.x * cameraSize.y) ( 0, 0 )
+    in
+    -- newCameraPos camera model.player.pos
+    newCameraPos2 model camera cameraSize
 
 
 render : Model -> List Renderable
@@ -66,8 +131,13 @@ view model =
 
         canvasHeight =
             round (model.screenSize.x * aspectRatio)
+
+        -- camera =
+        --     Camera.moveTo ( model.player.pos.x, model.player.pos.y ) (createCamera model.world.size)
+        camera =
+            getCamera model
     in
     div [ Attr.style "overflow" "hidden", Attr.style "width" "100vw", Attr.style "height" "100vh", style "background-color" "black" ]
-        [ Game.renderCentered { time = 0, camera = camera model.world.size, size = ( canvasWidth, canvasHeight ) }
+        [ Game.renderCentered { time = 0, camera = camera, size = ( canvasWidth, canvasHeight ) }
             (render model)
         ]

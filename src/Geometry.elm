@@ -36,7 +36,7 @@ flip v =
 
 norm : Vector -> Float
 norm v =
-    sqrt (v.x ^ 2 + v.y ^ 2)
+    sqrt <| dotProd v v
 
 
 normalise : Vector -> Vector
@@ -60,3 +60,37 @@ nullVector =
 isNullVector : Vector -> Bool
 isNullVector v =
     (v.x == 0) && (v.y == 0)
+
+
+down : Vector
+down =
+    Vector 0 -1
+
+
+up : Vector
+up =
+    Vector 0 1
+
+
+left : Vector
+left =
+    Vector -1 0
+
+
+right : Vector
+right =
+    Vector 1 0
+
+
+dotProd : Vector -> Vector -> Float
+dotProd v w =
+    v.x * w.x + v.y * w.y
+
+
+cosAngle : Vector -> Vector -> Float
+cosAngle v w =
+    if isNullVector v || isNullVector w then
+        0
+
+    else
+        dotProd v w / (norm v * norm w)

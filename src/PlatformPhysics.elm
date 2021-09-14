@@ -102,7 +102,7 @@ computeVelocity dt hasForce acceleration velocity =
         if hasForce || ((dt * abs acceleration.x) <= abs velocity.x) then
             cappedVelocity
         else
-            nullVector
+            { cappedVelocity | x = 0 }
 
 computeAcceleration : Vector -> Vector -> Vector -> Vector -> Vector
 computeAcceleration direction velocity pos gameWorldSize =
@@ -111,7 +111,7 @@ computeAcceleration direction velocity pos gameWorldSize =
     in
         add
             ( scale gravity down )
-            ( if isNullVector direction then
+            ( if direction.x == 0 then
                   drag
               else
                   add

@@ -19,6 +19,7 @@ import Browser.Events
         , onResize
         , onVisibilityChange
         )
+import Game.Resources as Resources exposing (Resources)
 import Html.Events exposing (keyCode)
 import Json.Decode as Decode exposing (Value)
 import Messages exposing (Msg(..))
@@ -59,7 +60,10 @@ subscriptions _ =
 
 init : Value -> ( Model, Cmd Msg )
 init _ =
-    ( Model.initial, Cmd.none )
+    ( Model.initial
+    , Cmd.batch
+        [ Cmd.map Resources (Resources.loadTextures [ "images/rocks.png" ]) ]
+    )
 
 
 

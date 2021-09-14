@@ -7,6 +7,7 @@ module Model exposing
     )
 
 import Browser.Dom exposing (getViewport)
+import Game.Resources as Resources exposing (Resources)
 import Geometry exposing (..)
 import Keys as Keys exposing (Keys, codes)
 import Messages exposing (Msg(..))
@@ -39,6 +40,7 @@ type alias Model =
     , player : Player
     , screenSize : Vector
     , gameWorldSize : Vector
+    , resources : Resources
     }
 
 
@@ -50,6 +52,7 @@ initial =
     , player = Player.initial
     , screenSize = Vector 800 500 -- Have to get the initial size somehow
     , gameWorldSize = Vector 16 8
+    , resources = Resources.init
     }
 
 
@@ -90,6 +93,11 @@ update action model =
             model
                 |> animate elapsed
                 |> animateKeys elapsed
+
+        Resources rMsg ->
+            ( { model | resources = Resources.update rMsg model.resources }
+            , Cmd.none
+            )
 
 
 animate : Float -> Model -> ( Model, Cmd Msg )

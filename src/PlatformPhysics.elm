@@ -23,7 +23,7 @@ defaultAcceleration =
 
 dragCoeff : Float
 dragCoeff =
-    0.025
+    20*0.025
 
 gravity : Float
 gravity =
@@ -85,17 +85,21 @@ computeVelocity dt hasForce acceleration velocity =
         naiveVelocity =
             add velocity (scale dt acceleration)
 
-        naiveSpeed =
-            norm naiveVelocity
-
-        cappedSpeed =
-            min naiveSpeed maxSpeed
+        cappedXSpeed =
+            min (abs naiveVelocity.x) maxSpeed
+        cappedYSpeed =
+            min (abs naiveVelocity.y) (2 * maxSpeed)
 
         cappedVelocity =
-            rescale cappedSpeed naiveVelocity
+            { naiveVelocity
+            | x = if naiveVelocity.x == 0 then 0 else
+                naiveVelocity.x * cappedXSpeed / (abs naiveVelocity.x)
+            , y = if naiveVelocity.y == 0 then 0 else
+                naiveVelocity.y * cappedYSpeed / (abs naiveVelocity.y)
+            }
           
     in
-        if hasForce || ((dt * abs acceleration.x) <= norm velocity) then
+        if hasForce || ((dt * abs acceleration.x) <= abs velocity.x) then
             cappedVelocity
         else
             nullVector
@@ -103,7 +107,7 @@ computeVelocity dt hasForce acceleration velocity =
 computeAcceleration : Vector -> Vector -> Vector -> Vector -> Vector
 computeAcceleration direction velocity pos gameWorldSize =
     let
-        drag = scale ((norm velocity)^2 * dragCoeff) <| flip <| normalise velocity
+        drag = scale ((norm velocity)^2 * dragCoeff) <| flip <| normalise { velocity | y = 0 }
     in
         add
             ( scale gravity down )

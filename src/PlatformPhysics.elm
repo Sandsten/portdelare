@@ -110,16 +110,19 @@ computeAcceleration direction velocity pos gameWorldSize =
         drag = scale ((norm velocity)^2 * dragCoeff) <| flip <| normalise { velocity | y = 0 }
     in
         add
-            ( scale gravity down )
-            ( if direction.x == 0 then
-                  drag
-              else
-                  add
-                      ( scale defaultAcceleration <| normalise { direction | y = 0 } )
-                      ( if (pos.y == 1/4 - gameWorldSize.y/2) && not (direction.y <= 0) then
-                           scale jumpAcc up
-                        else
-                           nullVector
-                      )
+            -- Slowdown drag or horizontal movement acceleration? (+ Gravity)
+            ( add
+                ( scale gravity down )
+                ( if direction.x == 0 then
+                    drag
+                else
+                    ( scale defaultAcceleration <| normalise { direction | y = 0 } )
+                )
+            )
+            -- Jumping?
+            ( if (pos.y == 1/4 - gameWorldSize.y/2) && not (direction.y <= 0) then
+                scale jumpAcc up
+            else
+                nullVector
             )
         

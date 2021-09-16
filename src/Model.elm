@@ -6,7 +6,10 @@ module Model exposing
     , update
     )
 
+-- import Game.TwoD.Camera exposing (Camera)
+
 import Browser.Dom exposing (getViewport)
+import CameraRig exposing (CameraRig, initial, move)
 import Game.Resources as Resources exposing (Resources)
 import Geometry exposing (..)
 import Keys as Keys exposing (Keys)
@@ -42,6 +45,7 @@ type alias Model =
     , screenSize : Vector
     , resources : Resources
     , world : World
+    , cameraRig : CameraRig
     }
 
 
@@ -54,6 +58,7 @@ initial =
     , screenSize = Vector 800 500 -- Have to get the initial size somehow
     , resources = Resources.init
     , world = World.initial
+    , cameraRig = CameraRig.initial <| scale 1 <| Vector 32 16
     }
 
 
@@ -94,6 +99,7 @@ update action model =
             model
                 |> animate elapsed
                 |> animateKeys elapsed
+                |> updateCameraRig elapsed
 
         Resources rMsg ->
             ( { model | resources = Resources.update rMsg model.resources }
@@ -116,6 +122,13 @@ animate elapsed model =
 animateKeys : Float -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
 animateKeys elapsed ( model, cmd ) =
     ( { model | keys = Keys.animate elapsed model.keys }
+    , cmd
+    )
+
+
+updateCameraRig : Float -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
+updateCameraRig elapsed ( model, cmd ) =
+    ( { model | cameraRig = CameraRig.move model.cameraRig model.player.pos model.world.size elapsed }
     , cmd
     )
 

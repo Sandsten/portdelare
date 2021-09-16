@@ -58,7 +58,7 @@ initial =
     , screenSize = Vector 800 500 -- Have to get the initial size somehow
     , resources = Resources.init
     , world = World.initial
-    , cameraRig = CameraRig.initial <| scale 1 <| Vector 32 16
+    , cameraRig = CameraRig.initial <| scale 0.5 <| Vector 32 16
     }
 
 

@@ -30,6 +30,15 @@ renderPlayer pos =
     Render.shape rectangle { color = playerColor, position = playerSpritePos, size = ( 0.5, 0.5 ) }
 
 
+renderFloor : Vector -> Renderable
+renderFloor worldSize =
+    let
+        floorThickness =
+            1
+    in
+    Render.shape rectangle { color = Color.gray, position = ( -worldSize.x / 2, (-worldSize.y / 2) - floorThickness ), size = ( worldSize.x, floorThickness ) }
+
+
 renderBackground : Resources -> List Renderable
 renderBackground resources =
     [ Render.parallaxScroll
@@ -51,6 +60,7 @@ render model =
     List.concat
         [ renderBackground model.resources
         , [ renderPlayer model.player.pos
+          , renderFloor model.world.size
           ]
         ]
 

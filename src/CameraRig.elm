@@ -39,10 +39,8 @@ position cameraRig =
     Vector x y
 
 
-
--- clamps a value in both directions.
-
-
+{-| Clamps a value in both directions. I.e x will be clamped to both clampVal and -clampVal
+-}
 clamp : Float -> Float -> Float
 clamp x clampVal =
     if x >= clampVal then

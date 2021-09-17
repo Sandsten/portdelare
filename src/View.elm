@@ -45,7 +45,7 @@ renderBackground resources =
         { z = -0.99
         , texture = Resources.getTexture "images/rocks.png" resources
         , tileWH = ( 1, 1 )
-        , scrollSpeed = ( 0.25, 0.25 )
+        , scrollSpeed = ( 1, 0.5 )
         }
     ]
 

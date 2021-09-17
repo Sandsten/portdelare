@@ -8,7 +8,6 @@ import Color
 import Game.TwoD.Camera as Cam exposing (..)
 import Game.TwoD.Render as Render exposing (Renderable, circle, shape, triangle)
 import Geometry exposing (..)
-import Html.Attributes exposing (target)
 
 
 type CameraBehaviour
@@ -116,6 +115,10 @@ renderDebugVisuals cameraRig =
         targetMarker =
             Render.shape circle { color = Color.green, position = toTuple cameraTargetMarkerPosition, size = toTuple markerSize }
     in
-    [ targetMarker
-    , cameraPositionMarker
-    ]
+    if cameraRig.debugVisuals then
+        [ targetMarker
+        , cameraPositionMarker
+        ]
+
+    else
+        []

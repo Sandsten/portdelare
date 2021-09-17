@@ -4,9 +4,7 @@ module CameraRig exposing (..)
 -- All logic for how the camera can move etc should be determined by the camera rig.
 -- More types could be defined such as follow speed, size etc..
 
-import Color
 import Game.TwoD.Camera as Cam exposing (..)
-import Game.TwoD.Render as Render exposing (Renderable, circle, shape, triangle)
 import Geometry exposing (..)
 
 
@@ -17,10 +15,12 @@ type CameraBehaviour
 
 type alias CameraRig =
     { camera : Cam.Camera
+    , position : Vector
     , size : Vector
     , followSpeed : Float
     , behaviour : CameraBehaviour
     , target : Vector
+    , followTargetVelocity : Vector
     , debugVisuals : Bool
     }
 
@@ -28,16 +28,18 @@ type alias CameraRig =
 initial : Vector -> CameraRig
 initial size =
     { camera = Cam.fixedArea (size.x * size.y) ( 0, 0 )
+    , position = Vector 0 0
     , size = size
     , followSpeed = 0.001
     , behaviour = FollowPlayer
     , target = Vector 0 0
+    , followTargetVelocity = Vector 0 0
     , debugVisuals = True
     }
 
 
-position : CameraRig -> Vector
-position cameraRig =
+getPosition : CameraRig -> Vector
+getPosition cameraRig =
     let
         ( x, y ) =
             Cam.getPosition cameraRig.camera
@@ -63,7 +65,7 @@ move : CameraRig -> Vector -> Vector -> Float -> CameraRig
 move cameraRig pPos worldSize elapsed =
     let
         camPos =
-            position cameraRig
+            getPosition cameraRig
 
         target =
             add pPos <| scale 2 Geometry.up
@@ -71,11 +73,11 @@ move cameraRig pPos worldSize elapsed =
         squaredDistance =
             (norm <| subtract target camPos) ^ 2.2
 
-        followPlayerVelocity =
+        followTargetVelocity =
             scale (elapsed * cameraRig.followSpeed * squaredDistance) <| normalise <| subtract target camPos
 
         newPosition =
-            add camPos followPlayerVelocity
+            add camPos followTargetVelocity
 
         -- Clamped values
         newPositionX =
@@ -91,34 +93,7 @@ move cameraRig pPos worldSize elapsed =
         -- Animate camera to follow player. Is it possible to if/else inside let/in? To avoid unissecary calculations if camera is stationary
         { cameraRig
             | camera = Cam.moveTo ( newPositionX, newPositionY ) cameraRig.camera
+            , position = camPos
             , target = target
+            , followTargetVelocity = followTargetVelocity
         }
-
-
-{-| Renders the camera target and current position
--}
-renderDebugVisuals : CameraRig -> List Renderable
-renderDebugVisuals cameraRig =
-    let
-        markerSize =
-            Vector 0.15 0.15
-
-        cameraPositionMarkerPosition =
-            subtract (toVector <| Cam.getPosition cameraRig.camera) <| scale 0.5 markerSize
-
-        cameraTargetMarkerPosition =
-            subtract cameraRig.target <| scale 0.5 markerSize
-
-        cameraPositionMarker =
-            Render.shape circle { color = Color.blue, position = toTuple cameraPositionMarkerPosition, size = toTuple markerSize }
-
-        targetMarker =
-            Render.shape circle { color = Color.green, position = toTuple cameraTargetMarkerPosition, size = toTuple markerSize }
-    in
-    if cameraRig.debugVisuals then
-        [ targetMarker
-        , cameraPositionMarker
-        ]
-
-    else
-        []

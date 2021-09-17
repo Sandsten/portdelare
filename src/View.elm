@@ -7,6 +7,7 @@ module View exposing (view)
 import Browser.Dom exposing (getViewport)
 import Color
 import Debug exposing (log)
+import DebugVisuals exposing (renderDebugVisuals)
 import Game.Resources as Resources exposing (Resources)
 import Game.TwoD as Game
 import Game.TwoD.Render as Render exposing (Renderable, circle, rectangle)
@@ -62,6 +63,7 @@ render model =
         , [ renderPlayer model.player.pos
           , renderFloor model.world.size
           ]
+        , renderDebugVisuals model
         ]
 
 

@@ -4,8 +4,11 @@ module CameraRig exposing (..)
 -- All logic for how the camera can move etc should be determined by the camera rig.
 -- More types could be defined such as follow speed, size etc..
 
+import Color
 import Game.TwoD.Camera as Cam exposing (..)
+import Game.TwoD.Render as Render exposing (Renderable, circle, shape, triangle)
 import Geometry exposing (..)
+import Html.Attributes exposing (target)
 
 
 type CameraBehaviour
@@ -18,6 +21,8 @@ type alias CameraRig =
     , size : Vector
     , followSpeed : Float
     , behaviour : CameraBehaviour
+    , target : Vector
+    , debugVisuals : Bool
     }
 
 
@@ -27,6 +32,8 @@ initial size =
     , size = size
     , followSpeed = 0.001
     , behaviour = FollowPlayer
+    , target = Vector 0 0
+    , debugVisuals = True
     }
 
 
@@ -59,9 +66,8 @@ move cameraRig pPos worldSize elapsed =
         camPos =
             position cameraRig
 
-        -- Adjust where player should be in the camera view (bottom half or center etc)
         target =
-            subtract pPos <| scale 1 Geometry.down
+            add pPos <| scale 2 Geometry.up
 
         squaredDistance =
             (norm <| subtract target camPos) ^ 2.2
@@ -84,4 +90,32 @@ move cameraRig pPos worldSize elapsed =
 
     else
         -- Animate camera to follow player. Is it possible to if/else inside let/in? To avoid unissecary calculations if camera is stationary
-        { cameraRig | camera = Cam.moveTo ( newPositionX, newPositionY ) cameraRig.camera }
+        { cameraRig
+            | camera = Cam.moveTo ( newPositionX, newPositionY ) cameraRig.camera
+            , target = target
+        }
+
+
+{-| Renders the camera target and current position
+-}
+renderDebugVisuals : CameraRig -> List Renderable
+renderDebugVisuals cameraRig =
+    let
+        markerSize =
+            Vector 0.15 0.15
+
+        cameraPositionMarkerPosition =
+            subtract (toVector <| Cam.getPosition cameraRig.camera) <| scale 0.5 markerSize
+
+        cameraTargetMarkerPosition =
+            subtract cameraRig.target <| scale 0.5 markerSize
+
+        cameraPositionMarker =
+            Render.shape circle { color = Color.blue, position = toTuple cameraPositionMarkerPosition, size = toTuple markerSize }
+
+        targetMarker =
+            Render.shape circle { color = Color.green, position = toTuple cameraTargetMarkerPosition, size = toTuple markerSize }
+    in
+    [ targetMarker
+    , cameraPositionMarker
+    ]

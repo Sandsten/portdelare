@@ -94,3 +94,13 @@ cosAngle v w =
 
     else
         dotProd v w / (norm v * norm w)
+
+
+toTuple : Vector -> ( Float, Float )
+toTuple v =
+    ( v.x, v.y )
+
+
+toVector : ( Float, Float ) -> Vector
+toVector ( x, y ) =
+    Vector x y
